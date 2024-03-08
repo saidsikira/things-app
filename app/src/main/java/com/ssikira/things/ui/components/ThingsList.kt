@@ -21,12 +21,11 @@ fun ThingsList(
                 LocalContext.current
             )
         )
-    ),
-    modifier: Modifier
+    )
 ) {
     val x by vm.items.collectAsState()
 
-    LazyColumn(modifier = modifier) {
+    LazyColumn {
         items(x) {
             Text(text = it.title)
         }

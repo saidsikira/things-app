@@ -26,16 +26,32 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ssikira.things.R
+import com.ssikira.things.viewmodel.Screen
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThingsNavigation(
-    content: @Composable () -> Unit
+    navController: NavHostController
 ) {
+    val currentDestination by navController.currentBackStackEntryAsState()
+    val currentRoute = currentDestination?.destination?.route
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -48,20 +64,20 @@ fun ThingsNavigation(
                     text = "Things",
                     style = MaterialTheme.typography.headlineLarge
                 )
-                NavigationDrawerItem(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    label = { Text(text = "Inbox") },
-                    icon = { Icon(Icons.Filled.Create, contentDescription = "Inbox") },
-                    selected = false,
-                    onClick = { /*TODO*/ }
-                )
-                NavigationDrawerItem(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    label = { Text(text = "Today") },
-                    icon = { Icon(Icons.Filled.Star, contentDescription = "Today") },
-                    selected = true,
-                    onClick = { /*TODO*/ }
-                )
+                DrawerItem(screen = Screen.Inbox, currentRoute = currentRoute) {
+                    navController.navigate(Screen.Inbox.route)
+                    scope.launch {
+                        drawerState.apply { close() }
+                    }
+                }
+
+                DrawerItem(screen = Screen.Today, currentRoute = currentRoute) {
+                    navController.navigate(Screen.Today.route)
+                    scope.launch {
+                        drawerState.apply { close() }
+                    }
+                }
+
                 HorizontalDivider(modifier = Modifier.padding(16.dp))
             }
         }) {
@@ -100,9 +116,47 @@ fun ThingsNavigation(
                 )
             }
         ) {
-            ThingsList(
-                modifier = Modifier.padding(it)
-            )
+            NavHost(
+                modifier = Modifier.padding(it),
+                navController = navController,
+                startDestination = "inbox"
+            ) {
+                composable(Screen.Inbox.route) {
+                    ThingsList()
+                }
+
+                composable(Screen.Today.route) {
+                    ThingsList()
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun DrawerItem(screen: Screen, currentRoute: String?, onClick: () -> Unit) {
+    val isSelected = screen.route == currentRoute
+
+    NavigationDrawerItem(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        label = { Text(text = screen.title) },
+        icon = { RouteIcon(route = screen.route) },
+        selected = isSelected,
+        onClick = onClick
+    )
+}
+
+@Composable
+fun RouteIcon(route: String) {
+    when (route) {
+        "inbox" -> Icon(Icons.Filled.Star, contentDescription = "Today")
+        "today" -> Icon(
+            painter = rememberVectorPainter(
+                image = ImageVector.vectorResource(
+                    id = R.drawable.inventory
+                )
+            ),
+            contentDescription = "Inventory"
+        )
     }
 }
