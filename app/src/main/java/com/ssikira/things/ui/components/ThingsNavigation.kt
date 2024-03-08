@@ -1,5 +1,6 @@
 package com.ssikira.things.ui.components
 
+import android.widget.SearchView
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,17 +17,23 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -74,6 +81,10 @@ fun ThingsNavigation(
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -84,28 +95,17 @@ fun ThingsNavigation(
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
-                DrawerItem(screen = Screen.Inbox, currentRoute = currentRoute) {
-                    navController.navigate(Screen.Inbox)
-                    scope.launch {
-                        drawerState.apply { close() }
+
+                listOf(Screen.Inbox, Screen.Today, Screen.Logbook).forEach {
+                    DrawerItem(screen = it, currentRoute = currentRoute) {
+                        navController.navigate(it)
+                        scope.launch {
+                            drawerState.apply { close() }
+                        }
                     }
                 }
 
-                DrawerItem(screen = Screen.Today, currentRoute = currentRoute) {
-                    navController.navigate(Screen.Today)
-                    scope.launch {
-                        drawerState.apply { close() }
-                    }
-                }
-
-                DrawerItem(screen = Screen.Logbook, currentRoute = currentRoute) {
-                    navController.navigate(Screen.Logbook)
-                    scope.launch {
-                        drawerState.apply { close() }
-                    }
-                }
-
-                HorizontalDivider(modifier = Modifier.padding(16.dp))
+                HorizontalDivider(modifier = Modifier.padding(12.dp))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -142,26 +142,39 @@ fun ThingsNavigation(
             },
             bottomBar = {
                 ThingsBottomBar {
-                    val item = Item(title = "Test Item", details = null, dateCompleted = null)
-                    vm.insertItem(item)
+                    showBottomSheet = true
                 }
             }
-        ) {
+        ) { it ->
             NavHost(
                 modifier = Modifier.padding(it),
                 navController = navController,
                 startDestination = "inbox"
             ) {
                 composable(Screen.Inbox.route) {
-                    ThingsList(vm = vm)
+                    ThingsList()
+
                 }
 
                 composable(Screen.Today.route) {
-                    ThingsList(vm = vm)
+                    ThingsList()
                 }
 
                 composable(Screen.Logbook.route) {
-                    ThingsList(vm = vm)
+                    ThingsList()
+                }
+
+
+            }
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = sheetState
+                ) {
+                    TaskEntry(onTaskAdded = {
+                        vm.insertItem(it)
+                        showBottomSheet = false
+                    })
                 }
             }
         }
@@ -182,10 +195,11 @@ fun DrawerItem(screen: Screen, currentRoute: String?, onClick: () -> Unit) {
 }
 
 @Composable
-fun RouteIcon(route: String) {
+fun RouteIcon(route: String, modifier: Modifier = Modifier) {
     when (route) {
-        "today" -> Icon(Icons.Filled.Star, contentDescription = "Today")
+        "today" -> Icon(Icons.Filled.Star, contentDescription = "Today", modifier = modifier)
         "log" -> Icon(
+            modifier = modifier,
             painter = rememberVectorPainter(
                 image = ImageVector.vectorResource(
                     id = R.drawable.library_books
@@ -195,6 +209,7 @@ fun RouteIcon(route: String) {
         )
 
         "inbox" -> Icon(
+            modifier = modifier,
             painter = rememberVectorPainter(
                 image = ImageVector.vectorResource(
                     id = R.drawable.inventory
