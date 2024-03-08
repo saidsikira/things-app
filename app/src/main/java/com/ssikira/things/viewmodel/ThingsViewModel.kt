@@ -18,10 +18,10 @@ class ThingsViewModel(private val db: ThingsDatabase) : ViewModel() {
     val items = _items.asStateFlow()
 
     init {
-        loadItems()
+        getAll()
     }
 
-    private fun loadItems() {
+    private fun getAll() {
         viewModelScope.launch {
             db.itemsDao().getAll().flowOn(Dispatchers.IO).collect { items ->
                 _items.update { items }
@@ -29,7 +29,7 @@ class ThingsViewModel(private val db: ThingsDatabase) : ViewModel() {
         }
     }
 
-    fun addItem(item: Item) {
+    fun insertItem(item: Item) {
         viewModelScope.launch(Dispatchers.IO) {
             db.itemsDao().insertItem(item)
         }
