@@ -1,11 +1,7 @@
 package com.ssikira.things.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.BottomAppBar
@@ -15,11 +11,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +32,7 @@ import com.ssikira.things.data.Item
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskEntry(
+fun NewTaskDialogContent(
     onTaskAdded: (Item) -> Unit
 ) {
     var tex by remember {
@@ -104,6 +97,6 @@ fun TaskEntry(
 
 @Preview(showBackground = true, wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE)
 @Composable
-fun TaskEntryPreview() {
-    TaskEntry(onTaskAdded = {})
+fun NewTaskDialogContentPreview() {
+    NewTaskDialogContent(onTaskAdded = {})
 }
