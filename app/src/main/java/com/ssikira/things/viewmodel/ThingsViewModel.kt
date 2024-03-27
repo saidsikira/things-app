@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ssikira.things.data.Item
 import com.ssikira.things.data.ThingsDatabase
+import com.ssikira.things.data.markCompleted
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,12 @@ class ThingsViewModel(private val db: ThingsDatabase) : ViewModel() {
     fun insertItem(item: Item) {
         viewModelScope.launch(Dispatchers.IO) {
             db.itemsDao().insertItem(item)
+        }
+    }
+
+    fun markCompleted(item: Item) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.itemsDao().markCompleted(item)
         }
     }
 }

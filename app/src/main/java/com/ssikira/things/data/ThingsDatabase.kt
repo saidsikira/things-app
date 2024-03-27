@@ -15,7 +15,7 @@ abstract class ThingsDatabase : RoomDatabase() {
         Room.databaseBuilder(
             it.applicationContext,
             ThingsDatabase::class.java, "things.db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     })
 }
 

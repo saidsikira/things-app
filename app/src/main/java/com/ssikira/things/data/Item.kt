@@ -13,7 +13,7 @@ data class Item(
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "details") val details: String?,
     @ColumnInfo(name = "date_created") val dateCreated: Date = Calendar.getInstance().time,
-    @ColumnInfo(name = "date_completed") val dateCompleted: Date?
+    @ColumnInfo(name = "date_completed") val dateCompleted: Date? = null
 )
 
 fun Item.isCompleted(): Boolean {

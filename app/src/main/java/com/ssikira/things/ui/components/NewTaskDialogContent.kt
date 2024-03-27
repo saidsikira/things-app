@@ -35,9 +35,7 @@ import com.ssikira.things.data.Item
 fun NewTaskDialogContent(
     onTaskAdded: (Item) -> Unit
 ) {
-    var tex by remember {
-        mutableStateOf("")
-    }
+    var text by remember { mutableStateOf("") }
 
     Column {
         TextField(
@@ -51,8 +49,8 @@ fun NewTaskDialogContent(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             ),
-            value = tex, onValueChange = {
-                tex = it
+            value = text, onValueChange = {
+                text = it
             }
         )
 
@@ -66,9 +64,9 @@ fun NewTaskDialogContent(
             tonalElevation = 0.dp,
             floatingActionButton = {
                 Button(
-                    enabled = tex != "",
+                    enabled = text != "",
                     onClick = {
-                        val item = Item(title = tex, details = null, dateCompleted = null)
+                        val item = Item(title = text, details = null, dateCompleted = null)
                         onTaskAdded(item)
                     }) {
                     Text(text = "Save")

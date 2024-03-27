@@ -66,7 +66,10 @@ fun ThingsList(
             }
         }
         items(x) {
-            Text(modifier = Modifier.padding(horizontal = 16.dp), text = it.title)
+//            Text(modifier = Modifier.padding(horizontal = 16.dp), text = it.title)
+            TaskListItem(item = it, onCheckedChange = {
+                vm.markCompleted(it)
+            })
         }
     }
 }
