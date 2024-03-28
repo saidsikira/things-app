@@ -6,10 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [Item::class], version = 1)
+@Database(entities = [Item::class, Project::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class ThingsDatabase : RoomDatabase() {
     abstract fun itemsDao(): ItemDao
+    abstract fun projectsDao(): ProjectDao
 
     companion object : SingletonHolder<ThingsDatabase, Context>({
         Room.databaseBuilder(

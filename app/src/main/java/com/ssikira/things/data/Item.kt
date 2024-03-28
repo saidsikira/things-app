@@ -2,18 +2,29 @@ package com.ssikira.things.data
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import java.util.Calendar
 import java.util.Date
 
-@Entity
+@Entity(
+    foreignKeys = [ForeignKey(
+        entity = Project::class,
+        parentColumns = ["id"],
+        childColumns = ["project_id"],
+        onDelete = ForeignKey.SET_NULL
+    )]
+)
+
 data class Item(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo(name = "project_id") val projectId: Int? = null,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "details") val details: String?,
     @ColumnInfo(name = "date_created") val dateCreated: Date = Calendar.getInstance().time,
-    @ColumnInfo(name = "date_completed") val dateCompleted: Date? = null
+    @ColumnInfo(name = "date_completed") val dateCompleted: Date? = null,
+    @ColumnInfo(name = "due_date") val dueDate: Date? = null
 )
 
 fun Item.isCompleted(): Boolean {

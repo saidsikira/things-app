@@ -50,7 +50,8 @@ fun TaskListItem(
         colors = CardDefaults.cardColors(
             containerColor = if (isChecked) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
         ),
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.padding(horizontal = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
