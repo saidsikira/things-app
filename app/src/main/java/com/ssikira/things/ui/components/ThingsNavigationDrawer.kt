@@ -49,6 +49,7 @@ import androidx.navigation.navArgument
 import com.ssikira.things.R
 import com.ssikira.things.data.Project
 import com.ssikira.things.data.ThingsDatabase
+import com.ssikira.things.data.ThingsRepository
 import com.ssikira.things.viewmodel.ItemsViewModelFactory
 import com.ssikira.things.viewmodel.Screen
 import com.ssikira.things.viewmodel.ThingsViewModel
@@ -60,9 +61,7 @@ import kotlinx.coroutines.launch
 fun ThingsNavigation(
     vm: ThingsViewModel = viewModel(
         factory = ItemsViewModelFactory(
-            ThingsDatabase.getInstance(
-                LocalContext.current
-            )
+            ThingsRepository(ThingsDatabase.getInstance(LocalContext.current))
         )
     ),
     navController: NavHostController

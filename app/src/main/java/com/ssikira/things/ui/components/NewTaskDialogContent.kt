@@ -37,6 +37,8 @@ fun NewTaskDialogContent(
 ) {
     var text by remember { mutableStateOf("") }
 
+
+
     Column {
         TextField(
             textStyle = MaterialTheme.typography.titleLarge,

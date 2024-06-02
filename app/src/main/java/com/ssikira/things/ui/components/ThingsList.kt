@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssikira.things.data.ThingsDatabase
+import com.ssikira.things.data.ThingsRepository
 import com.ssikira.things.viewmodel.ThingsViewModel
 import com.ssikira.things.viewmodel.ItemsViewModelFactory
 
@@ -32,9 +33,7 @@ import com.ssikira.things.viewmodel.ItemsViewModelFactory
 fun ThingsList(
     vm: ThingsViewModel = viewModel(
         factory = ItemsViewModelFactory(
-            ThingsDatabase.getInstance(
-                LocalContext.current
-            )
+            ThingsRepository(ThingsDatabase.getInstance(LocalContext.current))
         )
     )
 ) {

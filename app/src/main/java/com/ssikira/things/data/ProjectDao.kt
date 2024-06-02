@@ -25,5 +25,4 @@ interface ProjectDao {
     @Query("SELECT * from item WHERE date_completed IS NOT NULL ORDER BY date_completed DESC")
     fun getLogbook(): Flow<List<Item>>
 
-
 }

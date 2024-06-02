@@ -21,6 +21,15 @@ interface ItemDao {
 
     @Update
     fun updateItem(item: Item)
+
+    @Query("SELECT * FROM item WHERE project_id = :projectId")
+    fun getItemsByProject(projectId: Int): Flow<List<Item>>
+
+    @Query("SELECT * FROM item WHERE due_date = :today")
+    fun getItemsByDate(today: Date): Flow<List<Item>>
+
+    @Query("SELECT * FROM item WHERE project_id IS NULL AND due_date IS NULL AND date_completed IS NULL")
+    fun getItemsInInbox(): Flow<List<Item>>
 }
 
 fun ItemDao.markCompleted(item: Item) {
