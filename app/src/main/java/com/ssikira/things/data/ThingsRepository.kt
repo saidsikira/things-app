@@ -22,6 +22,10 @@ class ThingsRepository(private val db: ThingsDatabase) {
         return db.itemsDao().getItemsInInbox()
     }
 
+    fun getItemsInLogbook(): Flow<List<Item>> {
+        return db.itemsDao().getItemsInLogbook()
+    }
+
     fun getAllProjects(): Flow<List<Project>> {
         return db.projectsDao().getAllProjects()
     }

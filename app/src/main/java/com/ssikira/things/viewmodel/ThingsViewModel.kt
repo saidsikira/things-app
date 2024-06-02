@@ -29,6 +29,7 @@ class ThingsViewModel(private val repository: ThingsRepository) : ViewModel() {
     private val _items = _filter.flatMapLatest { filter ->
         when (filter) {
             is Filter.Inbox -> repository.getItemsInInbox()
+            is Filter.Logbook -> repository.getItemsInLogbook()
             is Filter.Project -> repository.getItemsByProject(filter.projectId)
             is Filter.Today -> repository.getItemsByDate(filter.today)
         }
@@ -51,7 +52,6 @@ class ThingsViewModel(private val repository: ThingsRepository) : ViewModel() {
         _filter.value = filter
     }
 
-
     fun insertItem(item: Item) {
         viewModelScope.launch {
             repository.insertItem(item)
@@ -68,6 +68,10 @@ class ThingsViewModel(private val repository: ThingsRepository) : ViewModel() {
         viewModelScope.launch {
             repository.markCompleted(item)
         }
+    }
+
+    fun getProjectName(projectId: Int): String {
+        return _projects.value.find { it.id == projectId }?.title ?: "Unknown Project"
     }
 }
 

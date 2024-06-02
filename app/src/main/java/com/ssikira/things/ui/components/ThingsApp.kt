@@ -7,5 +7,5 @@ import androidx.navigation.compose.rememberNavController
 fun ThingsApp() {
     val navController = rememberNavController()
 
-    ThingsNavigation(navController = navController)
+    ThingsNavigationDrawer(navController = navController)
 }

@@ -24,11 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.unit.dp
+import com.ssikira.things.data.Filter
 import com.ssikira.things.viewmodel.Screen
 import kotlinx.coroutines.launch
 
 @Composable
-fun ThingsBottomBar(onAdd: () -> Unit) {
+fun ThingsBottomBar(
+    onAdd: () -> Unit
+) {
     BottomAppBar(
         actions = {},
         floatingActionButton = {

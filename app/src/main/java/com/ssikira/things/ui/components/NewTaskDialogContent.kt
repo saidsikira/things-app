@@ -28,16 +28,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import com.ssikira.things.R
+import com.ssikira.things.data.Filter
 import com.ssikira.things.data.Item
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewTaskDialogContent(
+    hintedFilter: Filter,
     onTaskAdded: (Item) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
-
-
 
     Column {
         TextField(
@@ -69,6 +69,19 @@ fun NewTaskDialogContent(
                     enabled = text != "",
                     onClick = {
                         val item = Item(title = text, details = null, dateCompleted = null)
+
+                        when (hintedFilter) {
+                            Filter.Inbox -> item.dueDate = null
+                            Filter.Logbook -> item.dueDate = null
+                            is Filter.Project -> {
+                                item.projectId = hintedFilter.projectId
+                            }
+
+                            is Filter.Today -> {
+                                item.dueDate = hintedFilter.today
+                            }
+                        }
+
                         onTaskAdded(item)
                     }) {
                     Text(text = "Save")
@@ -98,5 +111,5 @@ fun NewTaskDialogContent(
 @Preview(showBackground = true, wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE)
 @Composable
 fun NewTaskDialogContentPreview() {
-    NewTaskDialogContent(onTaskAdded = {})
+    NewTaskDialogContent(hintedFilter = Filter.Inbox, onTaskAdded = {})
 }

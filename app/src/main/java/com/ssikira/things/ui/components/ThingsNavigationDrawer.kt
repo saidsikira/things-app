@@ -41,24 +41,24 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.ssikira.things.R
+import com.ssikira.things.data.Filter
 import com.ssikira.things.data.Project
 import com.ssikira.things.data.ThingsDatabase
 import com.ssikira.things.data.ThingsRepository
 import com.ssikira.things.viewmodel.ItemsViewModelFactory
 import com.ssikira.things.viewmodel.Screen
 import com.ssikira.things.viewmodel.ThingsViewModel
+import com.ssikira.things.viewmodel.projectId
+import com.ssikira.things.viewmodel.toFilter
 import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ThingsNavigation(
+fun ThingsNavigationDrawer(
     vm: ThingsViewModel = viewModel(
         factory = ItemsViewModelFactory(
             ThingsRepository(ThingsDatabase.getInstance(LocalContext.current))
@@ -68,6 +68,8 @@ fun ThingsNavigation(
 ) {
     val currentDestination by navController.currentBackStackEntryAsState()
     val currentRoute = currentDestination?.destination?.route ?: "inbox"
+    val projectId = currentDestination?.arguments?.getInt("id")
+    val hintedFilter = getHintedFilter(currentRoute, projectId)
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -103,20 +105,23 @@ fun ThingsNavigation(
                     item {
                         HorizontalDivider(modifier = Modifier.padding(12.dp))
                         ProjectDrawerHeader {
-                            val project = Project(title = "🎓  University")
+                            val project = Project(title = "Personal")
                             vm.insertProject(project)
                         }
                     }
 
                     items(projects.map { Screen.Project(id = it.id, name = it.title) }) {
-                        DrawerItem(screen = it, currentRoute = currentRoute) {
+                        DrawerItem(
+                            screen = it,
+                            currentRoute = currentRoute,
+                            currentProjectId = projectId
+                        ) {
                             navController.navigate(it)
                             scope.launch {
                                 drawerState.apply { close() }
                             }
                         }
                     }
-
                 }
             }
         }) {
@@ -142,15 +147,31 @@ fun ThingsNavigation(
             if (showBottomSheet) {
                 ModalBottomSheet(
                     onDismissRequest = { showBottomSheet = false },
+
                     sheetState = sheetState
                 ) {
-                    NewTaskDialogContent(onTaskAdded = {
-                        vm.insertItem(it)
-                        showBottomSheet = false
-                    })
+                    NewTaskDialogContent(
+                        hintedFilter = hintedFilter,
+                        onTaskAdded = {
+                            vm.insertItem(it)
+                            showBottomSheet = false
+                        })
                 }
             }
         }
+    }
+}
+
+fun getHintedFilter(route: String, projectId: Int?): Filter {
+    return when {
+        route.startsWith("today") -> Filter.Today()
+        route.startsWith("inbox") -> Filter.Inbox
+
+        route.startsWith("project/") -> {
+            projectId?.let { Filter.Project(projectId) } ?: Filter.Inbox
+        }
+
+        else -> Filter.Inbox
     }
 }
 
@@ -179,8 +200,15 @@ fun ProjectDrawerHeader(
 }
 
 @Composable
-fun DrawerItem(screen: Screen, currentRoute: String?, onClick: () -> Unit) {
-    val isSelected = screen.route == currentRoute
+fun DrawerItem(
+    screen: Screen,
+    currentRoute: String?,
+    currentProjectId: Int? = null,
+    onClick: () -> Unit
+) {
+    val isSelected = screen.route == currentRoute && screen.projectId() == currentProjectId
+
+    println("Screen: ${screen.route}, current route: $currentRoute")
 
     NavigationDrawerItem(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -219,10 +247,20 @@ fun RouteIcon(route: String, modifier: Modifier = Modifier) {
 
 fun NavHostController.navigate(screen: Screen) {
     this.navigate(screen.route) {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
         launchSingleTop = true
         restoreState = true
+    }
+}
+
+@Composable
+fun getCurrentFilter(route: String, projects: List<Project>): Filter {
+    return when {
+        route.startsWith("today") -> Filter.Today()
+        route.startsWith("project/") -> {
+            val projectId = route.substringAfter("project/").toIntOrNull()
+            projectId?.let { Filter.Project(it) } ?: Filter.Inbox
+        }
+
+        else -> Filter.Inbox
     }
 }

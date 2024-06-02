@@ -30,6 +30,9 @@ interface ItemDao {
 
     @Query("SELECT * FROM item WHERE project_id IS NULL AND due_date IS NULL AND date_completed IS NULL")
     fun getItemsInInbox(): Flow<List<Item>>
+
+    @Query("SELECT * FROM item WHERE date_completed IS NOT NULL")
+    fun getItemsInLogbook(): Flow<List<Item>>
 }
 
 fun ItemDao.markCompleted(item: Item) {

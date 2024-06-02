@@ -19,12 +19,12 @@ import java.util.Date
 
 data class Item(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "project_id") val projectId: Int? = null,
+    @ColumnInfo(name = "project_id") var projectId: Int? = null,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "details") val details: String?,
     @ColumnInfo(name = "date_created") val dateCreated: Date = Calendar.getInstance().time,
     @ColumnInfo(name = "date_completed") val dateCompleted: Date? = null,
-    @ColumnInfo(name = "due_date") val dueDate: Date? = null
+    @ColumnInfo(name = "due_date") var dueDate: Date? = null
 )
 
 fun Item.isCompleted(): Boolean {

@@ -17,12 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ssikira.things.data.Filter
 import com.ssikira.things.data.ThingsDatabase
 import com.ssikira.things.data.ThingsRepository
 import com.ssikira.things.viewmodel.ThingsViewModel
@@ -31,13 +33,17 @@ import com.ssikira.things.viewmodel.ItemsViewModelFactory
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ThingsList(
+    filter: Filter,
     vm: ThingsViewModel = viewModel(
         factory = ItemsViewModelFactory(
             ThingsRepository(ThingsDatabase.getInstance(LocalContext.current))
         )
     )
 ) {
+    vm.setFilter(filter);
     val x by vm.items.collectAsState()
+
+    val filterDescription = remember(filter) { getFilterDescription(filter, vm) }
 
     LazyColumn {
         stickyHeader {
@@ -57,7 +63,7 @@ fun ThingsList(
 //                        .padding(end = 8.dp)
 //                )
                 Text(
-                    text = "Today",
+                    text = filterDescription,
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium
@@ -70,5 +76,14 @@ fun ThingsList(
                 vm.markCompleted(it)
             })
         }
+    }
+}
+
+fun getFilterDescription(filter: Filter, vm: ThingsViewModel): String {
+    return when (filter) {
+        is Filter.Inbox -> "Inbox"
+        is Filter.Today -> "Today"
+        is Filter.Logbook -> "Logbook"
+        is Filter.Project -> vm.getProjectName(filter.projectId)
     }
 }
